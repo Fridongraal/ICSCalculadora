@@ -26,8 +26,14 @@ jobs:
       - name: Instalar dependencias
         run: pip install -r requirements.txt
 
-      - name: Ejecutar tests
-        run: pytest
+      - name: Ejecutar tests con cobertura
+        run: pytest --cov=. --cov-report=xml
+
+      - name: Análisis de SonarCloud
+        uses: SonarSource/sonarcloud-github-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   deploy:
     needs: test
