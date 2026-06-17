@@ -2,18 +2,15 @@ name: CI - Tests y Despliegue Calculadora
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Descargar el código del repositorio
         uses: actions/checkout@v4
@@ -21,10 +18,10 @@ jobs:
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Instalar dependencias
-        run: pip install -r requirements.txt
+        run: pip install --only-binary :all: -r requirements.txt
 
       - name: Ejecutar tests con cobertura
         run: pytest --cov=. --cov-report=xml
@@ -39,6 +36,10 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -52,7 +53,7 @@ jobs:
       - name: Subir el sitio como artefacto
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "."
+          path: '.'
 
       - name: Desplegar a GitHub Pages
         id: deployment
