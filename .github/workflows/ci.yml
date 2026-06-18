@@ -2,9 +2,9 @@ name: CI - Tests y Despliegue Calculadora
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
@@ -18,7 +18,7 @@ jobs:
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Instalar dependencias
         run: "pip install --only-binary :all: -r requirements.txt"
@@ -31,6 +31,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  docker-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Descargar el código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Construir imagen Docker
+        run: docker build -t icscalculadora .
+
+      - name: Ejecutar tests dentro del contenedor
+        run: docker run icscalculadora
 
   deploy:
     needs: test
@@ -53,7 +67,7 @@ jobs:
       - name: Subir el sitio como artefacto
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: "."
 
       - name: Desplegar a GitHub Pages
         id: deployment
